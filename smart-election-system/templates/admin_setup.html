@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% block title %}Initialize Election — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 40px 0;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 600px; padding: 48px;">
+        
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="display: inline-flex; padding: 8px 16px; background: rgba(139, 92, 246, 0.1); border-radius: 20px; color: var(--accent-violet); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
+                Protocol Initialization
+            </div>
+            <h2 style="font-size: 1.75rem; margin-bottom: 8px;">Create New Election</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">Configure the parameters for your secure digital ballot.</p>
+        </div>
+
+        <form action="{{ url_for('public.admin_setup') }}" method="POST" style="display: flex; flex-direction: column; gap: 32px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <!-- Institution Section -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-violet);">Institution Profile</h3>
+                <div class="input-group">
+                    <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">INSTITUTION NAME <span style="font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.5);">(min 3 characters)</span></label>
+                    <input type="text" name="institution_name" id="institution_name" required placeholder="ABC Society" 
+                        style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                        onfocus="this.style.borderColor='var(--accent-violet)'; this.style.boxShadow='0 0 0 4px rgba(139, 92, 246, 0.1)'"
+                        onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                    <small id="err_institution_name" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+                </div>
+            </div>
+
+            <!-- Schedule Section -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-violet);">Voting Window</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">START TIME</label>
+                        <input type="datetime-local" name="start_time" required
+                            style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s; color-scheme: dark;"
+                            onfocus="this.style.borderColor='var(--accent-violet)';"
+                            onblur="this.style.borderColor='var(--border-glass)';">
+                    </div>
+                    <div class="input-group">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">END TIME</label>
+                        <input type="datetime-local" name="end_time" required
+                            style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s; color-scheme: dark;"
+                            onfocus="this.style.borderColor='var(--accent-violet)';"
+                            onblur="this.style.borderColor='var(--border-glass)';">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Credentials -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-violet);">Master Administrator</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">USERNAME <span style="font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.5);">(firstname_secondname)</span></label>
+                        <input type="text" name="admin_username" id="admin_username" required placeholder="john_d" 
+                            style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                            onfocus="this.style.borderColor='var(--accent-violet)';"
+                            onblur="this.style.borderColor='var(--border-glass)';">                        <small id="err_admin_username" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>                    </div>
+                    <div class="input-group">
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">PASSWORD <span style="font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.5);">(4+ digits)</span></label>
+                        <input type="text" name="admin_password" id="admin_password" required placeholder="1234" autocomplete="off" 
+                            style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                            onfocus="this.style.borderColor='var(--accent-violet)';"
+                            onblur="this.style.borderColor='var(--border-glass)';">                        <small id="err_admin_password" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates Section -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-violet);">Candidate Roster</h3>
+                <div id="candidate-fields" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="candidate-row" style="display: flex; gap: 12px; align-items: flex-end;">
+                        <div class="input-group" style="flex: 1;">
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">CANDIDATE 1 (REQUIRED) <span style="font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.5);">(min 3 letters)</span></label>
+                            <input type="text" name="candidate1" id="candidate1" required placeholder="john" 
+                                style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                                onfocus="this.style.borderColor='var(--accent-violet)';"
+                                onblur="this.style.borderColor='var(--border-glass)';">                            <small id="err_candidate1" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>                        </div>
+                    </div>
+                    <div class="candidate-row" style="display: flex; gap: 12px; align-items: flex-end;">
+                        <div class="input-group" style="flex: 1;">
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">CANDIDATE 2 (REQUIRED) <span style="font-size: 0.65rem; font-weight: 400; color: rgba(255,255,255,0.5);">(min 3 letters)</span></label>
+                            <input type="text" name="candidate2" id="candidate2" required placeholder="alex" 
+                                style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                                onfocus="this.style.borderColor='var(--accent-violet)';"
+                                onblur="this.style.borderColor='var(--border-glass)';">                            <small id="err_candidate2" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>                        </div>
+                    </div>
+                </div>
+                <button type="button" id="add-candidate-button" style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--border-glass); background: rgba(139, 92, 246, 0.12); color: var(--accent-violet); font-size: 1.5rem; cursor: pointer; transition: 0.3s;">
+                    +
+                </button>
+            </div>
+
+            <button type="submit" class="btn-premium btn-primary" style="margin-top: 12px; background: linear-gradient(135deg, var(--accent-violet), #c026d3);">
+                Deploy Secure Election Protocol
+            </button>
+            <script>
+                (function() {
+                    const fieldsContainer = document.getElementById('candidate-fields');
+                    const addButton = document.getElementById('add-candidate-button');
+                    const instNameInput = document.getElementById('institution_name');
+                    const adminUsernameInput = document.getElementById('admin_username');
+                    const adminPasswordInput = document.getElementById('admin_password');
+
+                    // Validation helpers
+                    function validateAdminUsername(username) {
+                        const regex = /^[a-zA-Z]{3,}[_][a-zA-Z]{1,}$/;
+                        return regex.test(username);
+                    }
+
+                    function validateNumericPassword(password, minDigits) {
+                        return /^\d+$/.test(password) && password.length >= minDigits;
+                    }
+
+                    function validateCandidateName(name) {
+                        return /^[a-zA-Z]{3,}$/.test(name);
+                    }
+
+                    function showError(elementId, message) {
+                        const errorEl = document.getElementById(elementId);
+                        if (errorEl) {
+                            errorEl.textContent = message;
+                            errorEl.style.display = 'block';
+                        }
+                    }
+
+                    function hideError(elementId) {
+                        const errorEl = document.getElementById(elementId);
+                        if (errorEl) {
+                            errorEl.style.display = 'none';
+                        }
+                    }
+
+                    // Real-time validation for institution name
+                    instNameInput.addEventListener('input', function() {
+                        const value = this.value.trim();
+                        if (value && value.length < 3) {
+                            showError('err_institution_name', 'Enter a valid name (minimum 3 characters)');
+                        } else {
+                            hideError('err_institution_name');
+                        }
+                    });
+
+                    // Real-time validation for admin username
+                    adminUsernameInput.addEventListener('input', function() {
+                        const value = this.value.trim();
+                        if (value && !validateAdminUsername(value)) {
+                            showError('err_admin_username', 'Use format: firstname_secondname (e.g., sam_k, avoid random text)');
+                        } else {
+                            hideError('err_admin_username');
+                        }
+                    });
+
+                    // Real-time validation for admin password
+                    adminPasswordInput.addEventListener('input', function() {
+                        const value = this.value;
+                        if (value && !validateNumericPassword(value, 4)) {
+                            showError('err_admin_password', 'Password must be at least 4 digits (numbers only)');
+                        } else {
+                            hideError('err_admin_password');
+                        }
+                    });
+
+                    function getCandidateCount() {
+                        return fieldsContainer.querySelectorAll('.candidate-row').length;
+                    }
+
+                    function buildLabelText(index) {
+                        return `CANDIDATE ${index}${index <= 2 ? ' (REQUIRED)' : ''}`;
+                    }
+
+                    function createCandidateRow(index) {
+                        const row = document.createElement('div');
+                        row.className = 'candidate-row';
+                        row.style.display = 'flex';
+                        row.style.gap = '12px';
+                        row.style.alignItems = 'flex-end';
+
+                        const group = document.createElement('div');
+                        group.className = 'input-group';
+                        group.style.flex = '1';
+
+                        const label = document.createElement('label');
+                        label.style.display = 'block';
+                        label.style.fontSize = '0.75rem';
+                        label.style.fontWeight = '600';
+                        label.style.color = 'var(--text-secondary)';
+                        label.style.marginBottom = '8px';
+                        label.textContent = buildLabelText(index);
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.name = `candidate${index}`;
+                        input.id = `candidate${index}`;
+                        input.placeholder = 'e.g., sam';
+                        input.required = true;
+                        input.style.width = '100%';
+                        input.style.background = 'rgba(0,0,0,0.2)';
+                        input.style.border = '1px solid var(--border-glass)';
+                        input.style.borderRadius = '12px';
+                        input.style.padding = '14px';
+                        input.style.color = 'white';
+                        input.style.outline = 'none';
+                        input.style.transition = '0.3s';
+                        input.onfocus = function() { this.style.borderColor = 'var(--accent-violet)'; };
+                        input.onblur = function() { this.style.borderColor = 'var(--border-glass)'; };
+
+                        const errorMsg = document.createElement('small');
+                        errorMsg.id = `err_candidate${index}`;
+                        errorMsg.style.fontSize = '0.7rem';
+                        errorMsg.style.color = '#ff6b6b';
+                        errorMsg.style.marginTop = '4px';
+                        errorMsg.style.display = 'none';
+
+                        input.addEventListener('input', function() {
+                            const value = this.value.trim();
+                            if (value && !validateCandidateName(value)) {
+                                showError(errorMsg.id, 'Enter a valid name (min 3 letters, avoid random text like sdf)');
+                            } else {
+                                hideError(errorMsg.id);
+                            }
+                        });
+
+                        const removeButton = document.createElement('button');
+                        removeButton.type = 'button';
+                        removeButton.textContent = '−';
+                        removeButton.title = 'Remove candidate';
+                        removeButton.style.width = '48px';
+                        removeButton.style.height = '48px';
+                        removeButton.style.borderRadius = '50%';
+                        removeButton.style.border = '1px solid var(--border-glass)';
+                        removeButton.style.background = 'rgba(255,255,255,0.05)';
+                        removeButton.style.color = 'white';
+                        removeButton.style.fontSize = '1.5rem';
+                        removeButton.style.cursor = 'pointer';
+                        removeButton.addEventListener('click', function() {
+                            row.remove();
+                            refreshCandidateRows();
+                        });
+
+                        group.appendChild(label);
+                        group.appendChild(input);
+                        group.appendChild(errorMsg);
+                        row.appendChild(group);
+                        row.appendChild(removeButton);
+                        return row;
+                    }
+
+                    function refreshCandidateRows() {
+                        const rows = Array.from(fieldsContainer.querySelectorAll('.candidate-row'));
+                        rows.forEach((row, index) => {
+                            const idx = index + 1;
+                            const label = row.querySelector('label');
+                            const input = row.querySelector('input');
+                            if (label && input) {
+                                label.textContent = buildLabelText(idx);
+                                input.name = `candidate${idx}`;
+                                input.id = `candidate${idx}`;
+                                input.required = idx <= 2;
+                            }
+                            const removeButton = row.querySelector('button');
+                            if (removeButton) {
+                                removeButton.style.display = idx <= 2 ? 'none' : 'inline-flex';
+                            }
+                        });
+                    }
+
+                    addButton.addEventListener('click', function() {
+                        const nextIndex = getCandidateCount() + 1;
+                        fieldsContainer.appendChild(createCandidateRow(nextIndex));
+                    });
+
+                    fieldsContainer.querySelectorAll('.candidate-row').forEach((row, index) => {
+                        const removeButton = row.querySelector('button');
+                        if (removeButton) {
+                            removeButton.style.display = 'none';
+                        }
+                    });
+
+                    const form = addButton.closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function(event) {
+                            let hasError = false;
+
+                            const instName = instNameInput.value.trim();
+                            if (!instName || instName.length < 3) {
+                                showError('err_institution_name', 'Enter a valid name (minimum 3 characters)');
+                                hasError = true;
+                            } else {
+                                hideError('err_institution_name');
+                            }
+
+                            const adminUser = adminUsernameInput.value.trim();
+                            if (!adminUser || !validateAdminUsername(adminUser)) {
+                                showError('err_admin_username', 'Use format: firstname_secondname (e.g., sam_k, avoid random text)');
+                                hasError = true;
+                            } else {
+                                hideError('err_admin_username');
+                            }
+
+                            const adminPass = adminPasswordInput.value;
+                            if (!adminPass || !validateNumericPassword(adminPass, 4)) {
+                                showError('err_admin_password', 'Password must be at least 4 digits (numbers only)');
+                                hasError = true;
+                            } else {
+                                hideError('err_admin_password');
+                            }
+
+                            const inputs = Array.from(fieldsContainer.querySelectorAll('input[name^="candidate"]'));
+                            for (const input of inputs) {
+                                const value = input.value.trim();
+                                const candNum = input.id.replace('candidate', '');
+                                if (!value) {
+                                    showError(`err_candidate${candNum}`, 'Fill this field or remove the row');
+                                    hasError = true;
+                                } else if (!validateCandidateName(value)) {
+                                    showError(`err_candidate${candNum}`, 'Enter a valid name (min 3 letters, avoid random text like sdf)');
+                                    hasError = true;
+                                } else {
+                                    hideError(`err_candidate${candNum}`);
+                                }
+                            }
+
+                            if (hasError) {
+                                event.preventDefault();
+                            }
+                        });
+                    }
+                })();
+            </script>
+        </form>
+    </div>
+</div>
+{% endblock %}

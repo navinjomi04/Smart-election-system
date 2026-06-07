@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Institutional Report — Smart Election System{% endblock %}
+{% block crumb_extra %}<span aria-hidden="true"> / </span><span>Reports · Full</span>{% endblock %}
+{% block content %}
+
+<div class="report-sheet">
+    <button type="button" onclick="window.print()" class="glass-btn no-print" style="margin-bottom:16px;">Print report</button>
+
+    <div class="pdf-only report-header">
+        <div>
+            <span class="status-pill">Institutional Report</span>
+            <h1>{{ election.institution_name }}</h1>
+            <p>Final election report for SMARTVOTE institutional documentation.</p>
+            <p><strong>Institution Code:</strong> {{ election.institution_code if election else 'N/A' }}</p>
+        </div>
+        <div style="text-align:right; min-width:220px;">
+            <p style="margin-bottom:8px; color: var(--text-secondary);">Generated</p>
+            <p style="font-size:1rem; color: var(--text-primary);">{{ now }}</p>
+            <p style="margin-top:18px;"><span class="status-pill verified">Secure Audit</span></p>
+        </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <h1 style="margin:0;">Institutional election report</h1>
+        <p style="margin:6px 0 0 0; color:#64748b;">A complete summary of results, registry status, and security logs.</p>
+    </div>
+
+    <div class="report-metrics" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Election window</small>
+            <strong>{{ election.start_time if election else 'N/A' }} — {{ election.end_time if election else 'N/A' }}</strong>
+        </div>
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Approved voters</small>
+            <strong>{{ approved|length }}</strong>
+        </div>
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Rejected voters</small>
+            <strong>{{ rejected|length }}</strong>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2>Election results</h2>
+        <div class="table-scroll">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th class="text-right">Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if results %}
+                        {% for r in results %}
+                        <tr>
+                            <td>{{ r.name }}</td>
+                            <td class="text-right">{{ r.votes }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="empty-state" style="border:none; color: var(--text-secondary);">
+                                    <div class="empty-state-icon">📭</div>
+                                    No results available.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-card" style="margin-top:20px;">
+        <h2>Registry health</h2>
+        <div class="audit-row">
+            <div class="audit-metric">
+                <span class="report-label">Approved</span>
+                <strong>{{ approved|length }}</strong>
+            </div>
+            <div class="audit-metric">
+                <span class="report-label">Rejected</span>
+                <strong>{{ rejected|length }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card" style="margin-top:20px;">
+        <h2>Security log excerpts</h2>
+        <div class="table-scroll">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for log in logs[:8] %}
+                        <tr>
+                            <td>{{ log.timestamp }}</td>
+                            <td>{{ log.message }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="empty-state" style="border:none; color: var(--text-secondary);">
+                                    <div class="empty-state-icon">📋</div>
+                                    No security logs available.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pdf-only report-footer">
+        <span>SMARTVOTE | Institutional Election Report</span>
+        <span class="page-number"></span>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Cast Ballot — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="vote-shell reveal" style="max-width: 800px; margin: 0 auto;">
+    
+    <div style="text-align: center; margin-bottom: 48px;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 12px;">Electronic <span class="gradient-text">Ballot</span></h1>
+        {% if election %}
+        <p style="color: var(--text-secondary); font-weight: 600;">{{ election.institution_name }}</p>
+        {% endif %}
+    </div>
+
+    {% if message %}
+    <div class="glass-card" style="padding: 24px; margin-bottom: 32px; text-align: center; 
+         {% if step == 'blocked' %}border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); color: #f87171;
+         {% elif step == 'done' %}border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.05); color: #4ade80;
+         {% else %}border-color: rgba(234, 179, 8, 0.3); background: rgba(234, 179, 8, 0.05); color: #fbbf24;{% endif %}">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    {% if step == 'choose' and candidates and candidates|length > 0 %}
+    <form method="POST" id="vote-select-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 32px;">Please select your preferred candidate from the list below.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+            {% for candidate in candidates %}
+            <label class="glass-card" style="padding: 32px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 16px; transition: 0.3s; position: relative; overflow: hidden;">
+                <input type="radio" name="candidate_id" value="{{ candidate.id }}" required style="position: absolute; opacity: 0;">
+                <div class="radio-indicator" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border-glass); transition: 0.3s;"></div>
+                <span style="font-size: 1.25rem; font-weight: 700;">{{ candidate.name }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        
+        <div style="margin-top: 48px; text-align: center;">
+            <button type="submit" class="btn-premium btn-primary" style="padding: 16px 64px;">Continue to Confirmation</button>
+        </div>
+    </form>
+
+    {% elif step == 'confirm' %}
+    <div class="glass-card reveal" style="padding: 48px; text-align: center; border-color: var(--accent-blue);">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" style="margin-bottom: 24px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h2 style="margin-bottom: 16px;">Confirm Your Selection</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 32px;">You are about to cast your immutable ballot for:</p>
+        
+        <div style="font-size: 2rem; font-weight: 800; margin-bottom: 48px;" class="gradient-text">{{ selected_name }}</div>
+        
+        <form method="POST" style="display: flex; justify-content: center; gap: 16px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="candidate_id" value="{{ candidate_id_preview }}">
+            <input type="hidden" name="confirm_vote" value="1">
+            
+            <a href="{{ url_for('voter.vote') }}" class="btn-premium btn-secondary" style="padding: 16px 32px;">Cancel</a>
+            <button type="submit" class="btn-premium btn-primary" style="padding: 16px 48px;">Confirm & Submit Vote</button>
+        </form>
+    </div>
+
+    {% elif step == 'done' and verification_code %}
+    <div class="glass-card reveal" style="padding: 48px; text-align: center; border-color: #22c55e;">
+        <div style="width: 80px; height: 80px; background: rgba(34, 197, 94, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 style="margin-bottom: 16px;">Ballot Successfully Cast</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 40px; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Your vote has been cryptographically secured. Please save the verification code below to confirm your ballot later.
+        </p>
+        
+        <div class="glass-card" style="padding: 24px; background: rgba(0,0,0,0.2); font-family: monospace; font-size: 2rem; letter-spacing: 4px; color: var(--accent-blue); margin-bottom: 24px;" id="vote-verify-code">
+            {{ verification_code }}
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 16px;">
+            <button type="button" class="btn-premium btn-secondary" id="copy-verify-btn">Copy Code</button>
+            <a href="{{ url_for('voter.voter_dashboard') }}" class="btn-premium btn-primary">Return to Dashboard</a>
+        </div>
+    </div>
+
+    {% elif step == 'blocked' %}
+    <div style="text-align: center; margin-top: 64px;">
+        <a href="{{ url_for('voter.voter_dashboard') }}" class="btn-premium btn-secondary">Return to Dashboard</a>
+    </div>
+
+    {% elif step == 'choose' and not candidates %}
+    <div style="padding: 64px; text-align: center; color: var(--text-secondary);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 24px; opacity: 0.3;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14.7 8.38 8.38 0 0 1 3.8.9L21 3.5v8z"/><path d="M11 8v5l3 3"/></svg>
+        <p>No candidates are currently available for selection.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    label.glass-card:has(input:checked) {
+        border-color: var(--accent-blue);
+        background: rgba(59, 130, 246, 0.1);
+        transform: scale(1.02);
+    }
+    label.glass-card:has(input:checked) .radio-indicator {
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 10px var(--accent-blue);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function(){
+  var btn = document.getElementById('copy-verify-btn');
+  var code = document.getElementById('vote-verify-code');
+  if (btn && code && navigator.clipboard) {
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.textContent.trim()).then(function(){
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Code', 2000);
+      }).catch(function(){ btn.textContent = 'Copy failed'; });
+    });
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Application Received — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 520px; padding: 48px; text-align: center;">
+        
+        <div style="width: 80px; height: 80px; background: rgba(59, 130, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+
+        <h2 style="font-size: 1.75rem; margin-bottom: 12px;">Registration Received</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 40px;">Your identity application has been submitted to the secure node for administrative review.</p>
+
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; text-align: left; margin-bottom: 40px;">
+            <h3 style="font-size: 0.75rem; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;">Protocols in Motion</h3>
+            <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.875rem; color: var(--text-primary);">
+                <li style="display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); margin-top: 6px;"></div>
+                    <span>An election administrator will perform identity verification.</span>
+                </li>
+                <li style="display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); margin-top: 6px;"></div>
+                    <span>Upon approval, your cryptographic credentials will be activated.</span>
+                </li>
+                <li style="display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); margin-top: 6px;"></div>
+                    <span>Access your dashboard to check status or cast your ballot.</span>
+                </li>
+            </ul>
+        </div>
+
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{{ url_for('voter.voter_login') }}" class="btn-premium btn-primary">Go to Login</a>
+            <a href="{{ url_for('public.index') }}" class="btn-premium btn-secondary">Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

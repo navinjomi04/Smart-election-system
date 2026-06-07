@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Protocol Deployed — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 520px; padding: 48px; text-align: center; border-color: var(--accent-violet);">
+
+        <div style="width: 80px; height: 80px; background: rgba(139, 92, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+
+        <h2 style="font-size: 1.75rem; margin-bottom: 12px;">Protocol Deployed</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 40px;">Your secure election environment has been successfully initialized on the SMARTVOTE network.</p>
+
+        <div class="glass-card" style="padding: 32px; background: rgba(0,0,0,0.2); margin-bottom: 40px;">
+            <span style="display: block; font-size: 0.75rem; color: var(--accent-violet); font-weight: 700; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.1em;">Institution Access Code</span>
+            <div style="font-family: monospace; font-size: 2.5rem; font-weight: 800; letter-spacing: 4px; color: white;">{{ code }}</div>
+            <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 16px;">Voters must use this unique cryptographic identifier to register for your election.</p>
+        </div>
+
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="btn-premium btn-primary" style="background: linear-gradient(135deg, var(--accent-violet), #c026d3);">Access Control Center</a>
+            <a href="{{ url_for('public.index') }}" class="btn-premium btn-secondary">Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Server Error — Smart Election System{% endblock %}
+{% block crumb_extra %}<span aria-hidden="true"> / </span><span>Error</span>{% endblock %}
+{% block content %}
+<div class="empty-state" style="margin-top:24px;">
+    <div class="empty-state-icon">!</div>
+    <h2 style="color:#e2e8f0;margin:0 0 8px;">Something went wrong</h2>
+    <p>Please try again later. If the problem continues, contact support.</p>
+    <p style="margin-top:16px;"><a href="{{ url_for('public.index') }}" class="nav-link">Go home</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Access Denied — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 500px; padding: 48px; text-align: center; border-color: rgba(239, 68, 68, 0.3);">
+        
+        <div style="width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+
+        <h1 style="font-size: 1.75rem; margin-bottom: 8px;">Access Denied</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 32px;">The application for <strong>{{ username }}</strong> was not approved.</p>
+
+        <div class="glass-card" style="padding: 24px; background: rgba(239, 68, 68, 0.05); margin-bottom: 40px; text-align: left; border-color: rgba(239, 68, 68, 0.1);">
+            <span style="display: block; font-size: 0.75rem; color: #ef4444; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">Security Report</span>
+            <div style="font-weight: 600; margin-bottom: 4px;">{{ election.institution_name if election else 'Secure Election' }}</div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">An administrator has reviewed and declined your registration request. If you believe this is an error, please contact your institutional authority.</p>
+        </div>
+
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{{ url_for('auth.logout') }}" class="btn-premium btn-secondary">Logout & Exit</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

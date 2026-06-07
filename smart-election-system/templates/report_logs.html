@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Security Audit Report — Smart Election System{% endblock %}
+{% block crumb_extra %}<span aria-hidden="true"> / </span><span>Reports · Security</span>{% endblock %}
+{% block content %}
+
+<div class="report-sheet">
+    <button type="button" onclick="window.print()" class="glass-btn no-print" style="margin-bottom:16px;">Print report</button>
+
+    <div class="pdf-only report-header">
+        <div>
+            <span class="status-pill">Security Audit Report</span>
+            <h1>SMARTVOTE Audit Summary</h1>
+            <p>{{ election.institution_name if election else "Unknown institution" }}</p>
+            <p><strong>Institution Code:</strong> {{ election.institution_code if election else "N/A" }}</p>
+        </div>
+        <div style="text-align:right; min-width:220px;">
+            <p style="margin-bottom:8px; color: var(--text-secondary);">Generated</p>
+            <p style="font-size:1rem; color: var(--text-primary);">{{ now }}</p>
+            <p style="margin-top:18px;"><span class="status-pill alert">Audit ready</span></p>
+        </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <h1 style="margin:0;">Security audit</h1>
+        <p style="margin:6px 0 0 0; color:#64748b;">Review of activity, suspicious events, and registry status.</p>
+    </div>
+
+    <div class="report-metrics" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;">
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Total ballots cast</small>
+            <strong>{{ total_voters_participated }}</strong>
+        </div>
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Suspicious events</small>
+            <strong>{{ suspicious_logs|length if suspicious_logs else 0 }}</strong>
+        </div>
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Approved voters</small>
+            <strong>{{ approved_for_report|length }}</strong>
+        </div>
+        <div class="metric-card" style="flex:1 1 180px;">
+            <small>Rejected voters</small>
+            <strong>{{ rejected_for_report|length }}</strong>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2>Audit timeline</h2>
+        <div class="table-scroll" style="margin-top:18px;">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for log in logs[:7] %}
+                        <tr>
+                            <td>{{ log.timestamp }}</td>
+                            <td>{{ log.message }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="empty-state" style="border:none; color: var(--text-secondary);">
+                                    <div class="empty-state-icon">📋</div>
+                                    No audit log entries available.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-card" style="margin-top:20px;">
+        <h2>Suspicious activity</h2>
+        <div class="table-scroll">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if suspicious_logs %}
+                        {% for log in suspicious_logs %}
+                        <tr>
+                            <td>{{ log.timestamp }}</td>
+                            <td>{{ log.message }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="empty-state" style="border:none; color: var(--text-secondary);">
+                                    <div class="empty-state-icon">🛡️</div>
+                                    No suspicious activity detected.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section-card" style="margin-top:20px;">
+        <h2>Registry snapshot</h2>
+        <p><strong>Approved voters:</strong> {{ approved_for_report|length }}</p>
+        <p><strong>Rejected voters:</strong> {{ rejected_for_report|length }}</p>
+        <p><strong>Total votes cast:</strong> {{ total_voters_participated }}</p>
+    </div>
+
+    <div class="pdf-only report-footer">
+        <span>SMARTVOTE | Security Audit Report</span>
+        <span class="page-number"></span>
+    </div>
+</div>
+
+{% endblock %}

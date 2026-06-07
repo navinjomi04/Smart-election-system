@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found — Smart Election System{% endblock %}
+{% block crumb_extra %}<span aria-hidden="true"> / </span><span>404</span>{% endblock %}
+{% block content %}
+<div class="empty-state" style="margin-top:24px;">
+    <div class="empty-state-icon">?</div>
+    <h2 style="color:#e2e8f0;margin:0 0 8px;">Page not found</h2>
+    <p>The page you requested does not exist or has moved.</p>
+    <p style="margin-top:16px;"><a href="{{ url_for('public.index') }}" class="nav-link">Go home</a></p>
+</div>
+{% endblock %}

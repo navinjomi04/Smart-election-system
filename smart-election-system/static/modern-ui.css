@@ -1,0 +1,325 @@
+/* ================= MODERN UI OVERHAUL ================= */
+
+/* Root Variables for Consistency */
+:root {
+    --primary-glow: conic-gradient(
+        from 180deg at 50% 50%,
+        #16abff33 0deg,
+        #0885ff33 55deg,
+        #54d6ff33 120deg,
+        #0071ff33 160deg,
+        transparent 360deg
+    );
+    --secondary-glow: radial-gradient(
+        rgba(255, 255, 255, 1),
+        rgba(255, 255, 255, 0)
+    );
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+/* ================= BACKGROUND & BUBBLES ================= */
+body {
+    background: #020617 !important;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Floating Bubbles Container */
+.bubbles-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: rise 15s infinite ease-in, wobble 3s infinite ease-in-out;
+}
+
+@keyframes wobble {
+    0%, 100% { transform: translateX(0) scale(1); }
+    50% { transform: translateX(15px) scale(1.05); }
+}
+
+@keyframes rise {
+    0% {
+        bottom: -150px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        bottom: 110%;
+        opacity: 0;
+    }
+}
+
+/* ================= ENHANCED GLASSMORPHISM ================= */
+.content-card, .hero-glass-wide, .glass-panel, .auth-card, .gov-card, .admin-terminal, .voter-card, .winner-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+    border-radius: 24px !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.content-card:hover, .glass-panel:hover, .auth-card:hover {
+    border-color: rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 12px 48px 0 rgba(59, 130, 246, 0.2) !important;
+    transform: translateY(-5px);
+}
+
+/* ================= ANIMATIONS ================= */
+
+/* Entrance Animations */
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-glass-wide, .content-card, .auth-card {
+    animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Shimmer Effect for Headers */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.brand-mark, .hero-title, .admin-terminal h1, .voter-welcome {
+    background: linear-gradient(90deg, #fff, #3b82f6, #8b5cf6, #fff);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 5s linear infinite;
+    font-weight: 800;
+}
+
+/* ================= BUTTONS & INPUTS ================= */
+button, .glass-btn, .big-btn, .nav-link {
+    border-radius: 14px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before, .glass-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+button:hover::before, .glass-btn:hover::before {
+    width: 300%;
+    height: 300%;
+}
+
+.glass-btn.primary, button {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)) !important;
+    border: none !important;
+}
+
+.glass-btn.secondary {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-btn:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Inputs */
+input, select, textarea {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 14px !important;
+    color: #fff !important;
+    transition: all 0.3s ease !important;
+}
+
+input:focus {
+    border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+    outline: none !important;
+}
+
+/* ================= DASHBOARD ELEMENTS ================= */
+.kpi-box, .status-bar, .candidate-card, .card, .panel, .kpi-card-r, .winner-card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+    margin-bottom: 20px;
+}
+
+.kpi-card-r:hover, .panel:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border-color: var(--accent-blue) !important;
+    transform: translateY(-5px);
+}
+
+.kpi-num {
+    font-size: 28px !important;
+    background: linear-gradient(135deg, #fff, #3b82f6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+
+.feed-item {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+    margin-bottom: 10px !important;
+    transition: all 0.2s ease !important;
+}
+
+.feed-item:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    transform: translateX(5px);
+}
+
+.feed-item.success { border-left: 4px solid #10b981 !important; }
+.feed-item.warn { border-left: 4px solid #f59e0b !important; }
+.feed-item.danger { border-left: 4px solid #ef4444 !important; }
+
+/* ================= BUTTONS ================= */
+.btn, button, .glass-btn, .big-btn, .nav-link {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn.success { background: linear-gradient(135deg, #10b981, #059669) !important; color: white !important; }
+.btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: white !important; }
+.btn.warn { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: white !important; }
+
+.btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* ================= STATUS INDICATORS ================= */
+.status-live {
+    background: rgba(16, 185, 129, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ================= RESULTS BARS ================= */
+.result-bar-track {
+    background: rgba(255, 255, 255, 0.05) !important;
+    height: 12px !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.result-bar-fill {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6) !important;
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+/* ================= TOASTS ================= */
+.toast {
+    backdrop-filter: blur(10px) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding: 20px 40px !important;
+}
+
+.nav-link:hover {
+    color: var(--accent-blue) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ================= KEYFRAMES FOR BUBBLES ================= */
+@keyframes rise {
+    0% {
+        bottom: -100px;
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(100px);
+    }
+    100% {
+        bottom: 110%;
+        transform: translateX(-200px);
+    }
+}

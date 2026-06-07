@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Election System{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='world-class.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="mesh-bg"></div>
+
+<!-- Toast notifications -->
+{% with msgs = get_flashed_messages(with_categories=true) %}
+{% if msgs %}
+<div class="toast-stack" aria-live="polite">
+    {% for category, msg in msgs %}
+    {% set tc = 'info' if not category or category == 'message' else category %}
+    <div class="toast toast-{{ tc }}" role="alert">
+        <span class="toast-msg">{{ msg }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- Floating Navbar -->
+<header class="navbar">
+    <a href="{{ url_for('public.index') }}" class="brand">SMART<span class="gradient-text">VOTE</span></a>
+
+    <nav class="nav-links">
+        {% if not is_voter and not is_admin %}
+            <a href="{{ url_for('voter.voter_login') }}" class="nav-link">Voter</a>
+            <a href="{{ url_for('admin.admin_login') }}" class="nav-link">Admin</a>
+        {% elif is_voter %}
+            <a href="{{ url_for('voter.voter_dashboard') }}" class="nav-link">Dashboard</a>
+            {% if voter_status == 'approved' %}
+                <a href="{{ url_for('voter.vote') }}" class="nav-link">Vote</a>
+                <a href="{{ url_for('voter.verify_vote') }}" class="nav-link">Verify</a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}" class="nav-link danger">Logout</a>
+        {% elif is_admin %}
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="nav-link">Panel</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link danger">Logout</a>
+        {% endif %}
+    </nav>
+</header>
+
+<main style="padding-top: 120px; min-height: 100vh;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<script>
+(function () {
+    var stack = document.querySelector('.toast-stack');
+    if (stack) {
+        stack.querySelectorAll('.toast').forEach(function (el) {
+            setTimeout(function() {
+                el.style.transform = 'translateX(100%)';
+                el.style.opacity = '0';
+                el.style.transition = 'all 0.5s ease-in';
+                setTimeout(() => el.remove(), 500);
+            }, 4000);
+        });
+    }
+})();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

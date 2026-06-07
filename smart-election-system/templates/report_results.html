@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Election Results Report — Smart Election System{% endblock %}
+{% block crumb_extra %}<span aria-hidden="true"> / </span><span>Reports · Results</span>{% endblock %}
+{% block content %}
+
+<div class="report-sheet">
+    <button type="button" onclick="window.print()" class="glass-btn no-print" style="margin-bottom:16px;">Print report</button>
+
+    <div class="pdf-only report-header">
+        <div>
+            <span class="status-pill">Election Results Report</span>
+            <h1>SMARTVOTE Results</h1>
+            <p>{{ election.institution_name if election else "Unknown institution" }}</p>
+            <p><strong>Institution Code:</strong> {{ election.institution_code if election else "N/A" }}</p>
+        </div>
+        <div style="text-align:right; min-width:220px;">
+            <p style="margin-bottom:8px; color: var(--text-secondary);">Generated</p>
+            <p style="font-size:1rem; color: var(--text-primary);">{{ now }}</p>
+            <p style="margin-top:18px;"><span class="status-pill verified">PDF Summary</span></p>
+        </div>
+    </div>
+
+    <div class="screen-only">
+        <div class="report-header" style="padding:18px 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); margin-bottom:24px;">
+            <div>
+                <h1 style="margin:0 0 8px;">Election Results</h1>
+                <p style="margin:0; color: var(--text-secondary);">{{ election.institution_name if election else "Unknown institution" }}</p>
+            </div>
+            <div style="text-align:right; min-width:200px; color: var(--text-secondary);">
+                <p style="margin:0 0 4px;">Generated</p>
+                <p style="margin:0;">{{ now }}</p>
+            </div>
+        </div>
+
+        <div class="report-stats-grid" style="margin-bottom:20px;">
+            <div class="metric-card">
+                <small>Total ballots cast</small>
+                <strong>{{ total_votes }}</strong>
+            </div>
+            <div class="metric-card">
+                <small>Winner</small>
+                <strong>{{ winner if winner else ("Tie: " ~ (tied_candidates | join(", ")) if tie else "Pending") }}</strong>
+            </div>
+            <div class="metric-card">
+                <small>Election timeline</small>
+                <strong>{{ election.start_time if election else "N/A" }} — {{ election.end_time if election else "N/A" }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2>Candidate vote breakdown</h2>
+        <div class="table-scroll">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th class="text-right">Votes</th>
+                        <th class="text-right">Share</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if results and results|length > 0 %}
+                        {% for r in results %}
+                        {% set votes = r.vote_count %}
+                        {% set percent = (votes / total_votes * 100) | round(1) if total_votes > 0 else 0 %}
+                        <tr class="{{ 'winner' if winner and r.name == winner and not tie else '' }}">
+                            <td>{{ r.name }}</td>
+                            <td class="text-right">{{ votes }}</td>
+                            <td class="text-right">{{ percent }}%</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3">
+                                <div class="empty-state" style="border:none; color: var(--text-secondary);">
+                                    <div class="empty-state-icon">📭</div>
+                                    No results available.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pdf-only report-footer">
+        <span>SMARTVOTE | Election Results Report</span>
+        <span class="page-number"></span>
+    </div>
+</div>
+
+{% endblock %}

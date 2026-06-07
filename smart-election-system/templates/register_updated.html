@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Voter Registration — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 75vh;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 480px; padding: 48px;">
+        
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="display: inline-flex; padding: 8px 16px; background: rgba(59, 130, 246, 0.1); border-radius: 20px; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
+                Voter Enrollment
+            </div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Create Voter Identity</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">Join your institution's secure voting network.</p>
+        </div>
+
+        <form action="{{ url_for('public.register') }}" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Institution Code</label>
+                <input type="text" name="institution_code" required placeholder="INST-000" 
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.boxShadow='0 0 0 4px rgba(59, 130, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Username <span style="font-size: 0.65rem; font-weight: 400; color: rgba(59, 130, 246, 0.6);">(firstname_secondname)</span></label>
+                <input type="text" name="username" id="voter_username" required placeholder="sam_k" 
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.boxShadow='0 0 0 4px rgba(59, 130, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                <small id="err_voter_username" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Email Address <span style="font-size: 0.65rem; font-weight: 400; color: rgba(59, 130, 246, 0.6);">(@gmail.com)</span></label>
+                <input type="email" name="email" id="voter_email" required placeholder="sam@gmail.com" 
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.boxShadow='0 0 0 4px rgba(59, 130, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                <small id="err_voter_email" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Security Password <span style="font-size: 0.65rem; font-weight: 400; color: rgba(59, 130, 246, 0.6);">(3+ digits)</span></label>
+                <input type="text" name="password" id="voter_password" required placeholder="123" autocomplete="off"
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.boxShadow='0 0 0 4px rgba(59, 130, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                <small id="err_voter_password" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+            </div>
+
+            <button type="submit" class="btn-premium btn-primary" style="margin-top: 12px;">
+                Initialize Registration
+            </button>
+        </form>
+
+        <div style="margin-top: 32px; text-align: center; font-size: 0.875rem;">
+            <span style="color: var(--text-secondary);">Already registered?</span>
+            <a href="{{ url_for('voter.voter_login') }}" style="color: var(--accent-blue); text-decoration: none; font-weight: 600; margin-left: 4px;">Sign in here</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const form = document.querySelector('form');
+        const usernameInput = document.getElementById('voter_username');
+        const emailInput = document.getElementById('voter_email');
+        const passwordInput = document.getElementById('voter_password');
+
+        function validateVoterUsername(username) {
+            const regex = /^[a-zA-Z]{3,}[_][a-zA-Z]{1,}$/;
+            return regex.test(username);
+        }
+
+        function validateGmailEmail(email) {
+            return email.endsWith('@gmail.com');
+        }
+
+        function validateNumericPassword(password, minDigits) {
+            return /^\d+$/.test(password) && password.length >= minDigits;
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function hideError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Real-time validation
+        usernameInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value && !validateVoterUsername(value)) {
+                showError('err_voter_username', 'Use format: firstname_secondname (e.g., sam_k, avoid random text)');
+            } else {
+                hideError('err_voter_username');
+            }
+        });
+
+        emailInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value && !validateGmailEmail(value)) {
+                showError('err_voter_email', 'Email must end with @gmail.com');
+            } else {
+                hideError('err_voter_email');
+            }
+        });
+
+        passwordInput.addEventListener('input', function() {
+            const value = this.value;
+            if (value && !validateNumericPassword(value, 3)) {
+                showError('err_voter_password', 'Password must be at least 3 digits (numbers only)');
+            } else {
+                hideError('err_voter_password');
+            }
+        });
+
+        // Form submission validation
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                let hasError = false;
+
+                const username = usernameInput.value.trim();
+                if (!username || !validateVoterUsername(username)) {
+                    showError('err_voter_username', 'Use format: firstname_secondname (e.g., sam_k, avoid random text)');
+                    hasError = true;
+                } else {
+                    hideError('err_voter_username');
+                }
+
+                const email = emailInput.value.trim();
+                if (!email || !validateGmailEmail(email)) {
+                    showError('err_voter_email', 'Email must end with @gmail.com');
+                    hasError = true;
+                } else {
+                    hideError('err_voter_email');
+                }
+
+                const password = passwordInput.value;
+                if (!password || !validateNumericPassword(password, 3)) {
+                    showError('err_voter_password', 'Password must be at least 3 digits (numbers only)');
+                    hasError = true;
+                } else {
+                    hideError('err_voter_password');
+                }
+
+                if (hasError) {
+                    event.preventDefault();
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Verify Ballot — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="verify-shell reveal" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+    <div class="glass-card" style="width: 100%; max-width: 480px; padding: 48px;">
+        
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="display: inline-flex; padding: 8px 16px; background: rgba(59, 130, 246, 0.1); border-radius: 20px; color: var(--accent-blue); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
+                Audit Terminal
+            </div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Verify Your Ballot</h2>
+            {% if election %}
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">{{ election.institution_name }}</p>
+            {% endif %}
+        </div>
+
+        <div style="margin-bottom: 32px;">
+            {% if phase == "before" %}
+                <div style="padding: 12px; border-radius: 12px; background: rgba(234, 179, 8, 0.1); color: #eab308; font-size: 0.8125rem; font-weight: 600; text-align: center; border: 1px solid rgba(234, 179, 8, 0.2);">
+                    Session Pending: Election has not commenced.
+                </div>
+            {% elif phase == "during" %}
+                <div style="padding: 12px; border-radius: 12px; background: rgba(34, 197, 94, 0.1); color: #22c55e; font-size: 0.8125rem; font-weight: 600; text-align: center; border: 1px solid rgba(34, 197, 94, 0.2);">
+                    Active Session: Real-time verification enabled.
+                </div>
+            {% else %}
+                <div style="padding: 12px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); font-size: 0.8125rem; font-weight: 600; text-align: center; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    Post-Election Audit: Verify final recorded state.
+                </div>
+            {% endif %}
+        </div>
+
+        <form method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Verification Code</label>
+                <input type="text" name="code" required placeholder="Enter your unique code" autocomplete="off"
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s; font-family: monospace; letter-spacing: 2px;"
+                    onfocus="this.style.borderColor='var(--accent-blue)'; this.style.boxShadow='0 0 0 4px rgba(59, 130, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+            </div>
+
+            <button type="submit" class="btn-premium btn-primary">
+                Execute Audit Check
+            </button>
+        </form>
+
+        {% if message %}
+            <div class="reveal" style="margin-top: 24px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); text-align: center; font-weight: 600;">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <div style="margin-top: 32px; text-align: center;">
+            <a href="{{ url_for('voter.voter_dashboard') }}" style="color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if verification_report %}
+<div class="report-sheet">
+    <button type="button" onclick="window.print()" class="btn-premium glass-btn no-print" style="margin-bottom:20px;">Download PDF</button>
+
+    <div class="report-header">
+        <div>
+            <span class="status-pill">Ballot Verification Report</span>
+            <h1>Verification summary</h1>
+            <p>{{ election.institution_name if election else "Unknown institution" }}</p>
+            <p><strong>Election Code:</strong> {{ verification_report.election_reference }}</p>
+        </div>
+        <div style="text-align:right; min-width: 240px;">
+            <p style="margin-bottom:8px; color: var(--text-secondary);">Report generated</p>
+            <p style="font-size:1rem; color: var(--text-primary);">{{ verification_report.generated_at }}</p>
+            <p style="margin-top:18px;"><span class="status-pill verified">{{ verification_report.status }}</span></p>
+        </div>
+    </div>
+
+    <div class="report-stats-grid" style="margin-top:24px;">
+        <div class="metric-card">
+            <small>Verification code</small>
+            <strong>{{ verification_report.verification_code }}</strong>
+        </div>
+        <div class="metric-card">
+            <small>Election reference</small>
+            <strong>{{ verification_report.election_reference }}</strong>
+        </div>
+        <div class="metric-card">
+            <small>Candidate</small>
+            <strong>{{ verification_report.candidate_name }}</strong>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <div class="section-card">
+        <h2>Integrity details</h2>
+        <div class="audit-row" style="margin-top:16px;">
+            <div class="audit-metric">
+                <span class="report-label">Hash validation</span>
+                <strong>{{ verification_report.hash_status }}</strong>
+            </div>
+            <div class="audit-metric">
+                <span class="report-label">Reported status</span>
+                <strong class="status-pill verified">Verified</strong>
+            </div>
+        </div>
+
+        <div class="table-scroll" style="margin-top:22px;">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Data field</th>
+                        <th class="text-right">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vote hash</td>
+                        <td class="text-right">{{ verification_report.vote_hash }}</td>
+                    </tr>
+                    <tr>
+                        <td>Previous hash</td>
+                        <td class="text-right">{{ verification_report.previous_hash }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="report-footer">
+        <span>SMARTVOTE | Ballot Verification Report</span>
+        <span class="page-number"></span>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

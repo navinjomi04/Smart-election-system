@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Admin Access — Smart Election System{% endblock %}
+
+{% block content %}
+<div class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="glass-card reveal" style="width: 100%; max-width: 440px; padding: 48px;">
+
+        <div style="text-align: center; margin-bottom: 32px;">
+            <div style="display: inline-flex; padding: 8px 16px; background: rgba(139, 92, 246, 0.1); border-radius: 20px; color: var(--accent-violet); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
+                Administrative Console
+            </div>
+            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Admin Login</h2>
+            <p style="color: var(--text-secondary); font-size: 0.875rem;">Authorization required for system management.</p>
+        </div>
+
+        <form action="{{ url_for('admin.admin_login') }}" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Institution Code</label>
+                <input type="text" name="institution_code" required placeholder="INST-000" 
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-violet)'; this.style.boxShadow='0 0 0 4px rgba(139, 92, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Admin Username <span style="font-size: 0.65rem; font-weight: 400; color: rgba(139, 92, 246, 0.6);">(firstname_secondname)</span></label>
+                <input type="text" name="username" id="admin_login_username" required placeholder="john_d" 
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-violet)'; this.style.boxShadow='0 0 0 4px rgba(139, 92, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                <small id="err_admin_login_username" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+            </div>
+
+            <div class="input-group">
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase;">Password <span style="font-size: 0.65rem; font-weight: 400; color: rgba(139, 92, 246, 0.6);">(4+ digits)</span></label>
+                <input type="text" name="password" id="admin_login_password" required placeholder="1234" autocomplete="off"
+                    style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 14px; color: white; outline: none; transition: 0.3s;"
+                    onfocus="this.style.borderColor='var(--accent-violet)'; this.style.boxShadow='0 0 0 4px rgba(139, 92, 246, 0.1)'"
+                    onblur="this.style.borderColor='var(--border-glass)'; this.style.boxShadow='none'">
+                <small id="err_admin_login_password" style="font-size: 0.7rem; color: #ff6b6b; margin-top: 4px; display: none;"></small>
+            </div>
+
+            <button type="submit" class="btn-premium btn-primary" style="margin-top: 12px; background: linear-gradient(135deg, var(--accent-violet), #c026d3);">
+                Sign In to Console
+            </button>
+        </form>
+
+        <div style="margin-top: 32px; text-align: center; font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6;">
+            System Security Protocol Active · 256-bit Encryption
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const form = document.querySelector('form');
+        const usernameInput = document.getElementById('admin_login_username');
+        const passwordInput = document.getElementById('admin_login_password');
+
+        function validateAdminUsername(username) {
+            const regex = /^[a-zA-Z]{3,}[_][a-zA-Z]{1,}$/;
+            return regex.test(username);
+        }
+
+        function validateNumericPassword(password, minDigits) {
+            return /^\d+$/.test(password) && password.length >= minDigits;
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function hideError(elementId) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) {
+                errorEl.style.display = 'none';
+            }
+        }
+
+        // Real-time validation
+        usernameInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value && !validateAdminUsername(value)) {
+                showError('err_admin_login_username', 'Use format: firstname_secondname (e.g., john_d)');
+            } else {
+                hideError('err_admin_login_username');
+            }
+        });
+
+        passwordInput.addEventListener('input', function() {
+            const value = this.value;
+            if (value && !validateNumericPassword(value, 4)) {
+                showError('err_admin_login_password', 'Password must be at least 4 digits (numbers only)');
+            } else {
+                hideError('err_admin_login_password');
+            }
+        });
+
+        // Form submission validation
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                let hasError = false;
+
+                const username = usernameInput.value.trim();
+                if (!username || !validateAdminUsername(username)) {
+                    showError('err_admin_login_username', 'Use format: firstname_secondname (e.g., john_d)');
+                    hasError = true;
+                } else {
+                    hideError('err_admin_login_username');
+                }
+
+                const password = passwordInput.value;
+                if (!password || !validateNumericPassword(password, 4)) {
+                    showError('err_admin_login_password', 'Password must be at least 4 digits (numbers only)');
+                    hasError = true;
+                } else {
+                    hideError('err_admin_login_password');
+                }
+
+                if (hasError) {
+                    event.preventDefault();
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

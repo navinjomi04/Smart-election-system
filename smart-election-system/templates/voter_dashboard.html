@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Voter Dashboard — SMARTVOTE{% endblock %}
+
+{% block content %}
+<div class="dashboard-shell reveal">
+    
+    <!-- Header Area -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+        <div>
+            <h1 style="font-size: 2.5rem; margin-bottom: 8px;">Welcome, <span class="gradient-text">{{ username }}</span></h1>
+            <p style="color: var(--text-secondary);">Your secure voting terminal is ready.</p>
+        </div>
+        <div class="glass-card" style="padding: 12px 24px; border-radius: 16px; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: {% if phase == 'during' %}#22c55e{% elif phase == 'before' %}#eab308{% else %}#ef4444{% endif %}; box-shadow: 0 0 10px {% if phase == 'during' %}#22c55e{% elif phase == 'before' %}#eab308{% else %}#ef4444{% endif %};"></div>
+            <span style="font-weight: 700; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                {% if phase == "before" %}Starting in {{ time_left }}{% elif phase == "during" %}Live · {{ time_left }} Left{% else %}Election Ended{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px;">
+        
+        <!-- Election Info -->
+        <div class="glass-card" style="padding: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
+                <div>
+                    <span style="color: var(--accent-blue); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;">Active Election</span>
+                    <h2 style="font-size: 1.75rem; margin-top: 4px;">{{ election_name }}</h2>
+                </div>
+                <div style="text-align: right;">
+                    <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Institution</span>
+                    <span style="font-weight: 600;">{{ election.institution_code }}</span>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 24px; margin-bottom: 32px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; gap: 32px;">
+                    <div>
+                        <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">COMMENCES</span>
+                        <span style="font-family: monospace; font-size: 1rem;">{{ election.start_time }}</span>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">TERMINATES</span>
+                        <span style="font-family: monospace; font-size: 1rem;">{{ election.end_time }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 0;">
+                This election is conducted under the SMARTVOTE protocol. All ballots are cryptographically hashed and immutable once cast. 
+                Your participation is essential for a transparent democratic process.
+            </p>
+        </div>
+
+        <!-- Status & Actions -->
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+            
+            <!-- Participation Status -->
+            <div class="glass-card" style="padding: 32px; flex: 1;">
+                <h3 style="font-size: 1rem; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">Your Status</h3>
+                
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center;">
+                        {% if has_voted %}
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        {% else %}
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span style="display: block; font-weight: 700;">{% if has_voted %}BALLOT CAST{% else %}NOT VOTED{% endif %}</span>
+                        <span style="font-size: 0.875rem; color: var(--text-secondary);">{% if has_voted %}Verification ID Active{% else %}Awaiting Submission{% endif %}</span>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px;">
+                    {% if phase == "before" %}
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">The voting terminal will activate automatically when the election starts.</p>
+                    {% elif phase == "during" %}
+                        {% if has_voted %}
+                            <a href="{{ url_for('voter.verify_vote') }}" class="btn-premium btn-secondary" style="width: 100%;">Verify Ballot Integrity</a>
+                        {% elif voter_status != 'approved' %}
+                            <div style="padding: 12px; border-radius: 10px; background: rgba(234, 179, 8, 0.1); color: #eab308; font-size: 0.875rem; font-weight: 600; text-align: center;">
+                                Approval Pending
+                            </div>
+                        {% elif can_vote %}
+                            <a href="{{ url_for('voter.vote') }}" class="btn-premium btn-primary" style="width: 100%;">Access Ballot</a>
+                        {% endif %}
+                    {% else %}
+                        {% if has_voted %}
+                            <a href="{{ url_for('voter.verify_vote') }}" class="btn-premium btn-secondary" style="width: 100%;">Verify Result</a>
+                        {% else %}
+                            <p style="font-size: 0.875rem; color: var(--text-secondary);">This election has concluded.</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Security Info -->
+            <div class="glass-card" style="padding: 24px; background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.1);">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent-blue);">System Encrypted</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
